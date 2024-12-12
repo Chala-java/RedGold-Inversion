@@ -6,9 +6,9 @@ import java.sql.SQLException;
 
 public class Conexion {
 
-        private static final String URL = "jdbc:sqlite:C:/Users/Cossio/OneDrive/Documentos/RedGoldBank.db"; // Ruta a tu base de datos
+        private static final  String URL = "jdbc:sqlite:C:/SQL_lite/InversionesRed.db";  // Usar siempre el archivo .db
 
-        // Método para obtener la conexión
+
         public static Connection getConnection() {
             Connection conn = null;
             try {
@@ -20,7 +20,6 @@ public class Conexion {
             return conn;
         }
 
-        // Método para cerrar la conexión
         public static void closeConnection(Connection conn) {
             if (conn != null) {
                 try {

@@ -7,10 +7,11 @@ import java.sql.SQLException;
 
 public class Conector {
     public static void main(String[] args) {
-        String url = "jdbc:sqlite:C:/Users/Cossio/Desktop/RedGoldBank.db"; // Ruta actualizada
+        String url = "jdbc:sqlite:C:/SQL_lite/InversionesRed.db";  // Usar siempre el archivo .db
 
         try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement()) {
+
             // Configurar modos para acceso concurrente y bloqueos
             stmt.execute("PRAGMA busy_timeout = 10000;");
             stmt.execute("PRAGMA journal_mode = WAL;");
@@ -18,9 +19,10 @@ public class Conector {
             // Crear tabla 'usuario'
             String sqlUsuario = "CREATE TABLE IF NOT EXISTS usuario (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "usernae TEXT NOT NULL," +
+                    "username TEXT NOT NULL," +
                     "password TEXT NOT NULL," +
-                    "tipo TEXT NOT NULL);";
+                    "tipo TEXT NOT NULL," +
+                    "saldo REAL DEFAULT 0);";
             stmt.execute(sqlUsuario);
 
             // Crear tabla 'inversion'

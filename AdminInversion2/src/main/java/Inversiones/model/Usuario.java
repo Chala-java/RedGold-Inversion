@@ -1,23 +1,26 @@
 package Inversiones.model;
 
 import java.sql.*;
-
 import java.util.Scanner;
 
 public class Usuario {
-    protected int id;
-    protected String username;
-    protected String password;
-    protected String tipo; // 'cliente' o 'admin'
-
-    // Variable estática para almacenar el ID del usuario logueado
-    private static int usuarioLogueadoId = -1; // -1 indica que no hay usuario logueado
+    private int id;
+    private String username;
+    private String password;
+    private String tipo;
+    private double saldo;
+    private static int usuarioIniciadoId = -1; //
 
     // Constructor
-    public Usuario(String username, String password, String tipo) {
+    public Usuario(String username, String password, String tipo, double saldo) {
         this.username = username;
         this.password = password;
         this.tipo = tipo;
+        this.saldo = saldo;
+    }
+
+    public Usuario(String username, String password, String tipo)
+    {
     }
 
     // Getters y Setters
@@ -53,18 +56,27 @@ public class Usuario {
         this.tipo = tipo;
     }
 
-    // Método para obtener el ID del usuario logueado
-    public static int getUsuarioLogueadoId() {
-        return usuarioLogueadoId;
+    public double getSaldo() {
+        return saldo;
     }
 
-    // Método para registrar un usuario (tanto Admin como Cliente)
-    public static void registrarUsuario(Connection conn, String username, String password, String tipo) {
-        String sql = "INSERT INTO usuario (username, password, tipo) VALUES (?, ?, ?)";
+    public void setSaldo(double saldo) {
+        this.saldo = saldo;
+    }
+
+    // aqui se obtiene el ID del usuario que inicio sesion
+    public static int getUsuarioLogueadoId() {
+        return usuarioIniciadoId;
+    }
+
+    //Aqui se registra con su tipo de usuario tanto con su tipo de usuario
+    public static void registrarUsuario(Connection conn, String username, String password, String tipo, double saldo) {
+        String sql = "INSERT INTO usuario (username, password, tipo, saldo) VALUES (?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username);
             pstmt.setString(2, password);
             pstmt.setString(3, tipo);
+            pstmt.setDouble(4, saldo);
             pstmt.executeUpdate();
             System.out.println("Usuario registrado con éxito.");
         } catch (SQLException e) {
@@ -72,16 +84,17 @@ public class Usuario {
         }
     }
 
-    // Método para iniciar sesión
+    // aqui se inicia sesion
     public static Usuario iniciarSesion(Connection conn) {
+        // Solicita las credenciales del usuario
         Scanner scanner = new Scanner(System.in);
-
         System.out.println("** Iniciar sesión **");
         System.out.print("Ingrese el nombre de usuario: ");
         String username = scanner.nextLine();
         System.out.print("Ingrese la contraseña: ");
         String password = scanner.nextLine();
 
+        // Verifica las credenciales en la base de datos
         String sql = "SELECT * FROM usuario WHERE username = ? AND password = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username);
@@ -89,13 +102,16 @@ public class Usuario {
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 String tipo = rs.getString("tipo");
-                Usuario usuario = tipo.equals("admin") ? new Admin(username, password, tipo) : new Usuario(username, password, tipo);
+                double saldo = rs.getDouble("saldo");
+
+                // Dependiendo del tipo, crea un objeto Admin o Usuario
+                Usuario usuario = tipo.equals("admin") ? new Admin(username, password, tipo) : new Usuario(username, password, tipo, saldo);
                 usuario.id = rs.getInt("id");
 
-                // Guardar el ID del usuario logueado
-                usuarioLogueadoId = usuario.id;
+                // Guardar el ID del usuario que inició sesión
+                usuarioIniciadoId = usuario.id;
 
-                return usuario; // Devuelve un objeto de tipo Admin o Usuario
+                return usuario;
             } else {
                 System.out.println("Credenciales incorrectas.");
                 return null;
@@ -106,26 +122,34 @@ public class Usuario {
         }
     }
 
-    // Método para realizar una inversión
-    public static void realizarInversion(Connection conn, int clienteId) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Ingrese el monto de la inversión: ");
-        double monto = scanner.nextDouble();
-        scanner.nextLine(); // Limpiar el buffer
-
-        System.out.println("Seleccione el tipo de inversión (fiducuenta/plan semilla/colombia): ");
-        String tipoInversion = scanner.nextLine();
-
-        // Insertar la inversión en la base de datos
-        String sql = "INSERT INTO inversion (cliente_id, monto, tipo_inversion, fecha_inversion) VALUES (?, ?, ?, DATE('now'))";
+    // Método para actualizar el saldo del usuario
+    public static void actualizarSaldo(Connection conn, int usuarioId, double nuevoSaldo) {
+        String sql = "UPDATE usuario SET saldo = ? WHERE id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, clienteId);
-            pstmt.setDouble(2, monto);
-            pstmt.setString(3, tipoInversion);
+            pstmt.setDouble(1, nuevoSaldo);
+            pstmt.setInt(2, usuarioId);
             pstmt.executeUpdate();
-            System.out.println("Inversión realizada con éxito.");
         } catch (SQLException e) {
-            System.out.println("Error al realizar la inversión: " + e.getMessage());
+            System.out.println("Error al actualizar saldo: " + e.getMessage());
+        }
+    }
+
+    // Método para ver las inversiones de un usuario
+    public static void verInversiones(Connection conn, int usuarioId) {
+        String sql = "SELECT * FROM inversion WHERE cliente_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, usuarioId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                double monto = rs.getDouble("monto");
+                String tipoInversion = rs.getString("tipo_inversion");
+                String fechaInversion = rs.getString("fecha_inversion");
+
+                System.out.println("ID: " + id + ", Monto: " + monto + ", Tipo: " + tipoInversion + ", Fecha: " + fechaInversion);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al obtener las inversiones: " + e.getMessage());
         }
     }
 }
