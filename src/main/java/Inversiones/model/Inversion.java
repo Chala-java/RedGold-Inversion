@@ -98,17 +98,34 @@ public class Inversion {
 
     // Método para obtener las inversiones de un cliente
     public static void obtenerInversionesPorCliente(Connection conn, int clienteId) {
-        String sql = "SELECT * FROM inversion WHERE cliente_id = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, clienteId);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                double monto = rs.getDouble("monto");
-                String tipoInversion = rs.getString("tipo_inversion");
-                String fechaInversion = rs.getString("fecha_inversion");
+        String sqlUsuario = "SELECT username FROM usuario WHERE id = ?";
+        String sqlInversion = "SELECT * FROM inversion WHERE cliente_id = ?";
 
-                System.out.println("ID: " + id + ", Monto: " + monto + ", Tipo: " + tipoInversion + ", Fecha: " + fechaInversion);
+        try (PreparedStatement pstmtUsuario = conn.prepareStatement(sqlUsuario);
+             PreparedStatement pstmtInversion = conn.prepareStatement(sqlInversion)) {
+
+            pstmtUsuario.setInt(1, clienteId);
+            ResultSet rsUsuario = pstmtUsuario.executeQuery();
+
+            if (rsUsuario.next()) {
+                String username = rsUsuario.getString("username");
+                System.out.println("Bienvenido, " + username + ". Aquí están sus inversiones:");
+
+                pstmtInversion.setInt(1, clienteId);
+                ResultSet rsInversion = pstmtInversion.executeQuery();
+
+                boolean tieneInversiones = false;
+                while (rsInversion.next()) {
+                    double monto = rsInversion.getDouble("monto");
+                    String tipoInversion = rsInversion.getString("tipo_inversion");
+                    String fechaInversion = rsInversion.getString("fecha_inversion");
+
+                    System.out.println("Monto: " + monto + ", Tipo: " + tipoInversion + ", Fecha: " + fechaInversion);
+                    tieneInversiones = true;
+                }
+                if (!tieneInversiones) {
+                    System.out.println("Aún no tiene inversiones.");
+                }
             }
         } catch (SQLException e) {
             System.out.println("Error al obtener las inversiones: " + e.getMessage());

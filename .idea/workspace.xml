@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3afc3837-be79-4aa2-8eae-9eaa6f8cfb9b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/Inversiones/view/SwingApp.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Inversiones/model/Admin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Inversiones/model/Admin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Inversiones/model/Inversion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Inversiones/model/Inversion.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Inversiones/view/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Inversiones/view/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,19 +46,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Conector.executor": "Run",
-    "Application.ConexionAgregar.executor": "Run",
-    "Application.Main.executor": "Run",
-    "Application.SwingApp.executor": "Run",
-    "Application.TestConexion.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Conector.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ConexionAgregar.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.SwingApp.executor&quot;: &quot;Run&quot;,
+    &quot;Application.TestConexion.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">

@@ -30,49 +30,29 @@ public class Main {
 
                     switch (opcion) {
                         case 1:
-                            // Llamamos al método de registro de la clase Usuario
-                            System.out.print("Ingrese el nombre de usuario: ");
-                            String username = scanner.nextLine();
-                            System.out.print("Ingrese la contraseña: ");
-                            String password = scanner.nextLine();
-                            System.out.println("Elija el tipo de usuario: ");
-                            System.out.println("1. Cliente");
-                            System.out.println("2. Admin");
-                            int tipoOpcion = scanner.nextInt();
-                            scanner.nextLine(); // Limpiar el buffer
-                            String tipo = (tipoOpcion == 1) ? "cliente" : "admin";
-                            System.out.print("Ingrese el saldo inicial: ");
-                            double saldo = scanner.nextDouble();
-                            scanner.nextLine(); // Limpiar el buffer
-                            Usuario.registrarUsuario(conn, username, password, tipo, saldo);
+                            registrarUsuario(conn, scanner);
                             break;
 
                         case 2:
-                            // Llamamos al método de inicio de sesión de la clase Usuario
                             usuario = Usuario.iniciarSesion(conn);
                             if (usuario != null) {
                                 if (usuario instanceof Admin) {
                                     System.out.println("Bienvenido Admin.");
+                                    mostrarMenuAdmin(conn, usuario);
                                 } else {
-                                    System.out.println("Bienvenido Usuario.");
+                                    System.out.println("Bienvenido " + usuario.getUsername() + ".");
+                                    mostrarMenuUsuario(conn, scanner, usuario);
                                 }
                             }
                             break;
 
                         case 3:
-                            // Si el usuario ha iniciado sesión, puede invertir
-                            int usuarioLogueadoId = Usuario.getUsuarioLogueadoId();
-                            if (usuarioLogueadoId != -1) {
-                                Inversion.mostrarMenuInversion(conn, usuarioLogueadoId);
-                            } else {
-                                System.out.println("Debe iniciar sesión antes de realizar una inversión.");
-                            }
+                            invertir(conn);
                             break;
 
                         case 4:
-                            // Menú Admin
-                            if (Usuario.getUsuarioLogueadoId() != -1 && usuario instanceof Admin) {
-                                Admin.mostrarMenuAdmin(conn);
+                            if (usuario instanceof Admin) {
+                                mostrarMenuAdmin(conn, usuario);
                             } else {
                                 System.out.println("Debe iniciar sesión como administrador para acceder al menú Admin.");
                             }
@@ -89,6 +69,84 @@ public class Main {
             }
         } catch (SQLException e) {
             System.out.println("Error de conexión: " + e.getMessage());
+        }
+    }
+
+    private static void registrarUsuario(Connection conn, Scanner scanner) throws SQLException {
+        System.out.print("Ingrese el nombre de usuario: ");
+        String username = scanner.nextLine();
+        System.out.print("Ingrese la contraseña: ");
+        String password = scanner.nextLine();
+        System.out.println("Elija el tipo de usuario: ");
+        System.out.println("1. Cliente");
+        System.out.println("2. Admin");
+        int tipoOpcion = scanner.nextInt();
+        scanner.nextLine(); // Limpiar el buffer
+        String tipo = (tipoOpcion == 1) ? "cliente" : "admin";
+        double saldo = 0;
+
+        if ("cliente".equals(tipo)) {
+            System.out.print("Ingrese el saldo inicial: ");
+            saldo = scanner.nextDouble();
+            scanner.nextLine(); // Limpiar el buffer
+        }
+
+        Usuario.registrarUsuario(conn, username, password, tipo, saldo);
+    }
+
+    private static void mostrarMenuUsuario(Connection conn, Scanner scanner, Usuario usuario) {
+        int subOpcion;
+        do {
+            System.out.println("\n** Menú Usuario **");
+            System.out.println("1. Invertir");
+            System.out.println("2. Ver inversiones");
+            System.out.println("3. Salir");
+            System.out.print("Elija una opción: ");
+            subOpcion = scanner.nextInt();
+            scanner.nextLine(); // Limpiar el buffer
+
+            switch (subOpcion) {
+                case 1:
+                    invertir(conn);
+                    break;
+
+                case 2:
+                    verInversiones(conn);
+                    break;
+
+                case 3:
+                    System.out.println("Saliendo...");
+                    break;
+
+                default:
+                    System.out.println("Opción no válida.");
+            }
+        } while (subOpcion != 3);
+    }
+
+    private static void invertir(Connection conn) {
+        int usuarioLogueadoId = Usuario.getUsuarioLogueadoId();
+        if (usuarioLogueadoId != -1) {
+            Inversion.mostrarMenuInversion(conn, usuarioLogueadoId);
+        } else {
+            System.out.println("Debe iniciar sesión antes de realizar una inversión.");
+        }
+    }
+
+    private static void verInversiones(Connection conn) {
+        int usuarioLogueadoId = Usuario.getUsuarioLogueadoId();
+        if (usuarioLogueadoId != -1) {
+            Inversion.obtenerInversionesPorCliente(conn, usuarioLogueadoId);
+        } else {
+            System.out.println("Debe iniciar sesión antes de ver las inversiones.");
+        }
+    }
+
+    private static void mostrarMenuAdmin(Connection conn, Usuario usuario) {
+        if (Usuario.getUsuarioLogueadoId() != -1 && usuario instanceof Admin) {
+            Admin.mostrarMenuAdmin(conn);
+        } else {
+            System.out.println("Debe iniciar sesión como administrador para acceder al menú Admin.");
         }
     }
 }
